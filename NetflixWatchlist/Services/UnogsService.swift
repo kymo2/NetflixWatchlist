@@ -61,8 +61,19 @@ class UnogsService {
                 let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
                 if let results = jsonResponse?["results"] as? [[String: Any]] {
                     let catalogItems = results.prefix(5).compactMap { result in
-                        CatalogItem(
-                            itemId: result["id"] as? String ?? "",
+                        let itemId: String
+                        if let idString = result["netflix_id"] as? String {
+                            itemId = idString
+                        } else if let idInt = result["netflix_id"] as? Int {
+                            itemId = String(idInt)
+                        } else if let fallback = result["id"] as? String, !fallback.isEmpty {
+                            itemId = fallback
+                        } else {
+                            itemId = UUID().uuidString
+                        }
+
+                        return CatalogItem(
+                            itemId: itemId,
                             title: result["title"] as? String ?? "",
                             img: result["img"] as? String ?? "",
                             synopsis: result["synopsis"] as? String ?? "",
