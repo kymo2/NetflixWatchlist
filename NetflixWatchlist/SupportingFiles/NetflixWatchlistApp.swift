@@ -11,7 +11,9 @@ import SwiftUI
 struct NetflixWatchlistApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabBarView()
+                .environmentObject(SearchViewModel())
+                .environmentObject(WatchlistViewModel())
         }
     }
 }

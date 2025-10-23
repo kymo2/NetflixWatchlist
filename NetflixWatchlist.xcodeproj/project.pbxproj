@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		27AB547C2D4D75C100195685 /* NetflixWatchlist.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 27AB54722D4D75C100195685 /* NetflixWatchlist.xcdatamodeld */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		276D78252D4BF17F006E58B2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,11 +31,25 @@
 		276D78142D4BF17D006E58B2 /* NetflixWatchlist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetflixWatchlist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		276D78242D4BF17F006E58B2 /* NetflixWatchlistTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetflixWatchlistTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		276D782E2D4BF17F006E58B2 /* NetflixWatchlistUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetflixWatchlistUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		27AB54742D4D75C100195685 /* NetflixWatchlist.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = NetflixWatchlist.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		270519912D4C080A009E307E /* Exceptions for "NetflixWatchlist" folder in "NetflixWatchlist" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/Info.plist,
+			);
+			target = 276D78132D4BF17D006E58B2 /* NetflixWatchlist */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		276D78162D4BF17D006E58B2 /* NetflixWatchlist */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				270519912D4C080A009E307E /* Exceptions for "NetflixWatchlist" folder in "NetflixWatchlist" target */,
+			);
 			path = NetflixWatchlist;
 			sourceTree = "<group>";
 		};
@@ -75,6 +93,7 @@
 		276D780B2D4BF17D006E58B2 = {
 			isa = PBXGroup;
 			children = (
+				27AB54722D4D75C100195685 /* NetflixWatchlist.xcdatamodeld */,
 				276D78162D4BF17D006E58B2 /* NetflixWatchlist */,
 				276D78272D4BF17F006E58B2 /* NetflixWatchlistTests */,
 				276D78312D4BF17F006E58B2 /* NetflixWatchlistUITests */,
@@ -236,6 +255,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27AB547C2D4D75C100195685 /* NetflixWatchlist.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,6 +291,8 @@
 /* Begin XCBuildConfiguration section */
 		276D78362D4BF17F006E58B2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 276D78162D4BF17D006E58B2 /* NetflixWatchlist */;
+			baseConfigurationReferenceRelativePath = Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -321,6 +343,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = NetflixWatchlist/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -334,6 +357,8 @@
 		};
 		276D78372D4BF17F006E58B2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 276D78162D4BF17D006E58B2 /* NetflixWatchlist */;
+			baseConfigurationReferenceRelativePath = Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -378,6 +403,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = NetflixWatchlist/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -390,6 +416,8 @@
 		};
 		276D78392D4BF17F006E58B2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 276D78162D4BF17D006E58B2 /* NetflixWatchlist */;
+			baseConfigurationReferenceRelativePath = Secrets.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -419,6 +447,8 @@
 		};
 		276D783A2D4BF17F006E58B2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 276D78162D4BF17D006E58B2 /* NetflixWatchlist */;
+			baseConfigurationReferenceRelativePath = Secrets.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -448,6 +478,8 @@
 		};
 		276D783C2D4BF17F006E58B2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 276D78162D4BF17D006E58B2 /* NetflixWatchlist */;
+			baseConfigurationReferenceRelativePath = Secrets.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -467,6 +499,8 @@
 		};
 		276D783D2D4BF17F006E58B2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 276D78162D4BF17D006E58B2 /* NetflixWatchlist */;
+			baseConfigurationReferenceRelativePath = Secrets.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -486,6 +520,8 @@
 		};
 		276D783F2D4BF17F006E58B2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 276D78162D4BF17D006E58B2 /* NetflixWatchlist */;
+			baseConfigurationReferenceRelativePath = Secrets.xcconfig;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -503,6 +539,8 @@
 		};
 		276D78402D4BF17F006E58B2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 276D78162D4BF17D006E58B2 /* NetflixWatchlist */;
+			baseConfigurationReferenceRelativePath = Secrets.xcconfig;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -558,6 +596,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		27AB54722D4D75C100195685 /* NetflixWatchlist.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				27AB54742D4D75C100195685 /* NetflixWatchlist.xcdatamodel */,
+			);
+			currentVersion = 27AB54742D4D75C100195685 /* NetflixWatchlist.xcdatamodel */;
+			path = NetflixWatchlist.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 276D780C2D4BF17D006E58B2 /* Project object */;
 }
