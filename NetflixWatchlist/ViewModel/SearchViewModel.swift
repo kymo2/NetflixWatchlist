@@ -14,6 +14,7 @@ class SearchViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var selectedAvailability: [CountryAvailability] = []
     @Published var savedItems: [SavedCatalogItem] = []
+    @Published var watchlistMessage: String?
 
     private let service = UnogsService()
     private let coreDataManager = CoreDataManager.shared
@@ -64,12 +65,18 @@ class SearchViewModel: ObservableObject {
     func saveToWatchlist(item: CatalogItem) {
         print("🌍 Fetching country availability before saving \(item.title)")
 
+        guard !isItemSaved(item) else {
+            watchlistMessage = "Already on watchlist"
+            return
+        }
+
         service.fetchCatalogItemAvailability(itemId: item.itemId) { [weak self] availability in
             DispatchQueue.main.async {
                 print("✅ Retrieved \(availability.count) country availability records for \(item.title)")
-                
+
                 self?.coreDataManager.saveCatalogItem(item: item, availability: availability) // ✅ Save movie + country data
                 self?.fetchSavedItems() // ✅ Refresh saved items after saving
+                self?.watchlistMessage = "Added to watchlist"
             }
         }
     }
@@ -89,5 +96,15 @@ class SearchViewModel: ObservableObject {
                 }
             }
         }
+    }
+
+    func removeFromWatchlist(item: CatalogItem) {
+        coreDataManager.deleteSavedItem(itemId: item.itemId)
+        fetchSavedItems()
+        watchlistMessage = "Removed from watchlist"
+    }
+
+    func isItemSaved(_ item: CatalogItem) -> Bool {
+        savedItems.contains(where: { $0.itemId == item.itemId })
     }
 }
