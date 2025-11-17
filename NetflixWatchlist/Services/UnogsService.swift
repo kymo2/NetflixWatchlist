@@ -75,7 +75,7 @@ class UnogsService {
 
                         return CatalogItem(
                             itemId: itemId,
-                            title: (result["title"] as? String ?? "").decodedHTMLEntities(),
+                            title: result["title"] as? String ?? "",
                             img: result["img"] as? String ?? "",
                             synopsis: (result["synopsis"] as? String ?? "").decodedHTMLEntities(),
                             availability: nil
