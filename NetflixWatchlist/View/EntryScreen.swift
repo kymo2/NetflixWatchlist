@@ -37,7 +37,13 @@ struct EntryScreen: View {
             .textFieldStyle(RoundedBorderTextFieldStyle())
             .padding()
             
-            NavigationLink(destination: SearchResultsScreen(), isActive: .constant(!viewModel.searchResults.isEmpty)) {
+            NavigationLink(
+                destination: SearchResultsScreen(),
+                isActive: Binding(
+                    get: { !viewModel.searchResults.isEmpty },
+                    set: { _ in }
+                )
+            ) {
                 EmptyView()
             }
             
