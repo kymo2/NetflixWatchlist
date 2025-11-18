@@ -10,6 +10,7 @@ import SwiftUI
 struct CatalogDetailScreen: View {
     let catalogItem: CatalogItem
     @EnvironmentObject var viewModel: SearchViewModel
+    @State private var showWatchlistAlert = false
 
     var body: some View {
         VStack {
@@ -30,17 +31,27 @@ struct CatalogDetailScreen: View {
                 .padding()
 
             Button(action: {
-                viewModel.saveToWatchlist(item: catalogItem)
+                if viewModel.isItemSaved(catalogItem) {
+                    viewModel.removeFromWatchlist(item: catalogItem)
+                } else {
+                    viewModel.saveToWatchlist(item: catalogItem)
+                }
+                showWatchlistAlert = viewModel.watchlistMessage != nil
             }) {
-                Text("Add to Watchlist")
+                Text(viewModel.isItemSaved(catalogItem) ? "Remove from Watchlist" : "Add to Watchlist")
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.blue)
+                    .background(viewModel.isItemSaved(catalogItem) ? Color.red : Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(10)
             }
             .padding()
-            
+            .alert(viewModel.watchlistMessage ?? "", isPresented: $showWatchlistAlert) {
+                Button("OK", role: .cancel) {
+                    viewModel.watchlistMessage = nil
+                }
+            }
+
             List(viewModel.selectedAvailability, id: \.countryCode) { country in
                 HStack {
                     Text("\(country.country) (\(country.countryCode))")
@@ -52,6 +63,10 @@ struct CatalogDetailScreen: View {
         .navigationTitle("Movie Details")
         .onAppear {
             viewModel.fetchAvailability(for: catalogItem)
+            viewModel.fetchSavedItems()
+        }
+        .onChange(of: viewModel.watchlistMessage) { newValue in
+            showWatchlistAlert = newValue != nil
         }
     }
 }

@@ -44,6 +44,11 @@ class UnogsService {
             return
         }
 
+        guard !apiKey.isEmpty, !apiHost.isEmpty else {
+            completion(.failure(.missingCredentials))
+            return
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue(apiKey, forHTTPHeaderField: "x-rapidapi-key")
@@ -57,15 +62,31 @@ class UnogsService {
                 return
             }
 
+            if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+                completion(.failure(.networkError("HTTP \(httpResponse.statusCode)")))
+                return
+            }
+
             do {
                 let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
                 if let results = jsonResponse?["results"] as? [[String: Any]] {
                     let catalogItems = results.prefix(5).compactMap { result in
-                        CatalogItem(
-                            itemId: result["id"] as? String ?? "",
-                            title: result["title"] as? String ?? "",
+                        let itemId: String
+                        if let idString = result["netflix_id"] as? String {
+                            itemId = idString
+                        } else if let idInt = result["netflix_id"] as? Int {
+                            itemId = String(idInt)
+                        } else if let fallback = result["id"] as? String, !fallback.isEmpty {
+                            itemId = fallback
+                        } else {
+                            itemId = UUID().uuidString
+                        }
+
+                        return CatalogItem(
+                            itemId: itemId,
+                            title: (result["title"] as? String ?? "").decodedHTMLEntities(),
                             img: result["img"] as? String ?? "",
-                            synopsis: result["synopsis"] as? String ?? "",
+                            synopsis: (result["synopsis"] as? String ?? "").decodedHTMLEntities(),
                             availability: nil
                         )
                     }
@@ -85,6 +106,12 @@ class UnogsService {
             return
         }
 
+        guard !apiKey.isEmpty, !apiHost.isEmpty else {
+            print("Missing API credentials; cannot fetch availability")
+            completion([])
+            return
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue(apiKey, forHTTPHeaderField: "x-rapidapi-key")
@@ -95,6 +122,12 @@ class UnogsService {
         URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
                 print("Error fetching availability:", error?.localizedDescription ?? "Unknown error")
+                completion([])
+                return
+            }
+
+            if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+                print("Availability request failed with status: \(httpResponse.statusCode)")
                 completion([])
                 return
             }
@@ -119,5 +152,30 @@ class UnogsService {
                 completion([])
             }
         }.resume()
+    }
+}
+
+private extension String {
+    func decodedHTMLEntities() -> String {
+        guard !isEmpty else { return self }
+
+        let wrappedHTML = "<span>\(self)</span>"
+        if let data = wrappedHTML.data(using: .utf8) {
+            let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
+                .documentType: NSAttributedString.DocumentType.html,
+                .characterEncoding: String.Encoding.utf8.rawValue
+            ]
+
+            if let attributed = try? NSAttributedString(data: data, options: options, documentAttributes: nil) {
+                return attributed.string
+            }
+        }
+
+        return self
+            .replacingOccurrences(of: "&#39;", with: "'")
+            .replacingOccurrences(of: "&quot;", with: "\"")
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: "&lt;", with: "<")
+            .replacingOccurrences(of: "&gt;", with: ">")
     }
 }
