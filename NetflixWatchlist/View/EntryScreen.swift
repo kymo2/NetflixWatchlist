@@ -13,8 +13,8 @@ struct EntryScreen: View {
     var body: some View {
         VStack {
             Spacer()
-            
-            Text("\(viewModel.apiCallCount)")
+
+            Text("Remaining API Calls (PST): \(viewModel.apiCallCount) of \(viewModel.apiLimit)")
                 .font(.title)
                 .fontWeight(.bold)
 

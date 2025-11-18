@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WatchlistScreen: View {
     @EnvironmentObject var watchlistViewModel: WatchlistViewModel
+    @State private var showClearConfirmation = false
 
     var body: some View {
         VStack {
@@ -36,6 +37,25 @@ struct WatchlistScreen: View {
             }
         }
         .navigationTitle("Watchlist")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                if !watchlistViewModel.savedItems.isEmpty {
+                    Button(role: .destructive) {
+                        showClearConfirmation = true
+                    } label: {
+                        Text("Clear All")
+                    }
+                }
+            }
+        }
+        .alert("Clear watchlist?", isPresented: $showClearConfirmation) {
+            Button("Delete All", role: .destructive) {
+                watchlistViewModel.clearWatchlist()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will remove every saved title from your watchlist.")
+        }
         .onAppear {
             watchlistViewModel.fetchSavedItems()
         }

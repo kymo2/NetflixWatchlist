@@ -15,25 +15,33 @@ class UnogsService {
     private let userDefaults = UserDefaults.standard
     private let apiCallCountKey = "UnogsAPICallCount"
     private let lastResetDateKey = "UnogsLastResetDate"
+    private let pacificTimeZone = TimeZone(identifier: "America/Los_Angeles") ?? .current
 
     init() {
         apiKey = Bundle.main.object(forInfoDictionaryKey: "API_KEY") as? String ?? ""
         apiHost = Bundle.main.object(forInfoDictionaryKey: "API_HOST") as? String ?? ""
         resetApiCountIfNewDay() // run check every time app runs
     }
-    
+
     func remainingApiCalls() -> Int {
-        return userDefaults.integer(forKey: apiCallCountKey)
+        resetApiCountIfNewDay()
+        let usedCalls = userDefaults.integer(forKey: apiCallCountKey)
+        return max(0, maxApiCallsPerDay - usedCalls)
     }
 
     private func incrementApiCallCount() {
-        let newCount = remainingApiCalls() + 1
+        resetApiCountIfNewDay()
+        let usedCalls = userDefaults.integer(forKey: apiCallCountKey)
+        let newCount = min(maxApiCallsPerDay, usedCalls + 1)
         userDefaults.set(newCount, forKey: apiCallCountKey)
     }
-    
+
     private func resetApiCountIfNewDay() {
         let lastResetDate = userDefaults.object(forKey: lastResetDateKey) as? Date ?? Date.distantPast
-        if !Calendar.current.isDateInToday(lastResetDate) {
+        var pacificCalendar = Calendar(identifier: .gregorian)
+        pacificCalendar.timeZone = pacificTimeZone
+
+        if !pacificCalendar.isDate(lastResetDate, inSameDayAs: Date()) {
             userDefaults.set(0, forKey: apiCallCountKey)
             userDefaults.set(Date(), forKey: lastResetDateKey)
         }

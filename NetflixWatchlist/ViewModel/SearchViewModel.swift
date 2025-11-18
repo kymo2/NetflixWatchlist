@@ -19,6 +19,10 @@ class SearchViewModel: ObservableObject {
     private let service = UnogsService()
     private let coreDataManager = CoreDataManager.shared
 
+    var apiLimit: Int {
+        service.maxApiCallsPerDay
+    }
+
     init() {
         fetchSavedItems()
         apiCallCount = service.remainingApiCalls()
@@ -50,18 +54,24 @@ class SearchViewModel: ObservableObject {
                     }
 //                    self.searchResults = []
                 }
+                self.apiCallCount = self.service.remainingApiCalls()
             }
         }
-        apiCallCount = service.remainingApiCalls()
+        DispatchQueue.main.async {
+            self.apiCallCount = self.service.remainingApiCalls()
+        }
     }
 
     func fetchAvailability(for catalogItem: CatalogItem) {
         service.fetchCatalogItemAvailability(itemId: catalogItem.itemId) { [weak self] availability in
             DispatchQueue.main.async {
                 self?.selectedAvailability = availability
+                self?.apiCallCount = self?.service.remainingApiCalls() ?? 0
             }
         }
-        apiCallCount = service.remainingApiCalls()
+        DispatchQueue.main.async {
+            self.apiCallCount = self.service.remainingApiCalls()
+        }
     }
 
     func saveToWatchlist(item: CatalogItem) {
@@ -87,6 +97,8 @@ class SearchViewModel: ObservableObject {
 
     func fetchSavedItems() {
         savedItems = coreDataManager.fetchSavedItems()
+        let savedIDs = Set(savedItems.compactMap { $0.itemId })
+        pendingWatchlistItemIDs.subtract(savedIDs)
 
 //        // ✅ Print to console for debugging
 //        print("🎥 Saved Movies in Core Data:")

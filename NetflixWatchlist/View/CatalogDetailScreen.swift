@@ -14,13 +14,20 @@ struct CatalogDetailScreen: View {
 
     var body: some View {
         VStack {
-            Text("\(viewModel.apiCallCount)")
+            Text("Remaining API Calls (PST): \(viewModel.apiCallCount) of \(viewModel.apiLimit)")
                 .font(.title)
                 .fontWeight(.bold)
-            
-            AsyncImage(url: URL(string: catalogItem.img))
-                .frame(width: 150, height: 225)
-                .cornerRadius(8)
+
+            AsyncImage(url: URL(string: catalogItem.img)) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            } placeholder: {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.2))
+            }
+            .frame(width: 150, height: 225)
+            .cornerRadius(8)
             
             Text(catalogItem.title)
                 .font(.title)
