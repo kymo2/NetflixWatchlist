@@ -14,9 +14,15 @@ class SearchViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var selectedAvailability: [CountryAvailability] = []
     @Published var savedItems: [SavedCatalogItem] = []
+    @Published var watchlistMessage: String?
+    @Published private(set) var pendingWatchlistItemIDs: Set<String> = []
 
     private let service = UnogsService()
     private let coreDataManager = CoreDataManager.shared
+
+    var apiLimit: Int {
+        service.maxApiCallsPerDay
+    }
 
     init() {
         fetchSavedItems()
@@ -38,6 +44,8 @@ class SearchViewModel: ObservableObject {
                     switch error {
                     case .invalidURL:
                         self.errorMessage = "Invalid URL"
+                    case .missingCredentials:
+                        self.errorMessage = "Missing API credentials. Check API_KEY and API_HOST."
                     case .networkError(let message):
                         self.errorMessage = "Network error: \(message)"
                     case .emptyResults:
@@ -47,29 +55,44 @@ class SearchViewModel: ObservableObject {
                     }
 //                    self.searchResults = []
                 }
+                self.apiCallCount = self.service.remainingApiCalls()
             }
         }
-        apiCallCount = service.remainingApiCalls()
+        DispatchQueue.main.async {
+            self.apiCallCount = self.service.remainingApiCalls()
+        }
     }
 
     func fetchAvailability(for catalogItem: CatalogItem) {
         service.fetchCatalogItemAvailability(itemId: catalogItem.itemId) { [weak self] availability in
             DispatchQueue.main.async {
                 self?.selectedAvailability = availability
+                self?.apiCallCount = self?.service.remainingApiCalls() ?? 0
             }
         }
-        apiCallCount = service.remainingApiCalls()
+        DispatchQueue.main.async {
+            self.apiCallCount = self.service.remainingApiCalls()
+        }
     }
 
     func saveToWatchlist(item: CatalogItem) {
         print("🌍 Fetching country availability before saving \(item.title)")
 
+        guard !isItemSaved(item) else {
+            watchlistMessage = "Already on watchlist"
+            return
+        }
+
+        pendingWatchlistItemIDs.insert(item.itemId)
+
         service.fetchCatalogItemAvailability(itemId: item.itemId) { [weak self] availability in
             DispatchQueue.main.async {
                 print("✅ Retrieved \(availability.count) country availability records for \(item.title)")
-                
+
                 self?.coreDataManager.saveCatalogItem(item: item, availability: availability) // ✅ Save movie + country data
                 self?.fetchSavedItems() // ✅ Refresh saved items after saving
+                self?.pendingWatchlistItemIDs.remove(item.itemId)
+                self?.watchlistMessage = "Added to watchlist"
             }
         }
     }
@@ -78,6 +101,8 @@ class SearchViewModel: ObservableObject {
 
     func fetchSavedItems() {
         savedItems = coreDataManager.fetchSavedItems()
+        let savedIDs = Set(savedItems.compactMap { $0.itemId })
+        pendingWatchlistItemIDs.subtract(savedIDs)
 
 //        // ✅ Print to console for debugging
 //        print("🎥 Saved Movies in Core Data:")
@@ -89,5 +114,16 @@ class SearchViewModel: ObservableObject {
                 }
             }
         }
+    }
+
+    func removeFromWatchlist(item: CatalogItem) {
+        coreDataManager.deleteSavedItem(itemId: item.itemId)
+        fetchSavedItems()
+        pendingWatchlistItemIDs.remove(item.itemId)
+        watchlistMessage = "Removed from watchlist"
+    }
+
+    func isItemSaved(_ item: CatalogItem) -> Bool {
+        savedItems.contains(where: { $0.itemId == item.itemId }) || pendingWatchlistItemIDs.contains(item.itemId)
     }
 }

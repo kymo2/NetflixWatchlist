@@ -13,8 +13,8 @@ struct EntryScreen: View {
     var body: some View {
         VStack {
             Spacer()
-            
-            Text("\(viewModel.apiCallCount)")
+
+            Text("Remaining API Calls (PST): \(viewModel.apiCallCount) of \(viewModel.apiLimit)")
                 .font(.title)
                 .fontWeight(.bold)
 
@@ -37,7 +37,13 @@ struct EntryScreen: View {
             .textFieldStyle(RoundedBorderTextFieldStyle())
             .padding()
             
-            NavigationLink(destination: SearchResultsScreen(), isActive: .constant(!viewModel.searchResults.isEmpty)) {
+            NavigationLink(
+                destination: SearchResultsScreen(),
+                isActive: Binding(
+                    get: { !viewModel.searchResults.isEmpty },
+                    set: { _ in }
+                )
+            ) {
                 EmptyView()
             }
             

@@ -10,16 +10,24 @@ import SwiftUI
 struct CatalogDetailScreen: View {
     let catalogItem: CatalogItem
     @EnvironmentObject var viewModel: SearchViewModel
+    @State private var showWatchlistAlert = false
 
     var body: some View {
         VStack {
-            Text("\(viewModel.apiCallCount)")
+            Text("Remaining API Calls (PST): \(viewModel.apiCallCount) of \(viewModel.apiLimit)")
                 .font(.title)
                 .fontWeight(.bold)
-            
-            AsyncImage(url: URL(string: catalogItem.img))
-                .frame(width: 150, height: 225)
-                .cornerRadius(8)
+
+            AsyncImage(url: URL(string: catalogItem.img)) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            } placeholder: {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.2))
+            }
+            .frame(width: 150, height: 225)
+            .cornerRadius(8)
             
             Text(catalogItem.title)
                 .font(.title)
@@ -30,17 +38,27 @@ struct CatalogDetailScreen: View {
                 .padding()
 
             Button(action: {
-                viewModel.saveToWatchlist(item: catalogItem)
+                if viewModel.isItemSaved(catalogItem) {
+                    viewModel.removeFromWatchlist(item: catalogItem)
+                } else {
+                    viewModel.saveToWatchlist(item: catalogItem)
+                }
+                showWatchlistAlert = viewModel.watchlistMessage != nil
             }) {
-                Text("Add to Watchlist")
+                Text(viewModel.isItemSaved(catalogItem) ? "Remove from Watchlist" : "Add to Watchlist")
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.blue)
+                    .background(viewModel.isItemSaved(catalogItem) ? Color.red : Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(10)
             }
             .padding()
-            
+            .alert(viewModel.watchlistMessage ?? "", isPresented: $showWatchlistAlert) {
+                Button("OK", role: .cancel) {
+                    viewModel.watchlistMessage = nil
+                }
+            }
+
             List(viewModel.selectedAvailability, id: \.countryCode) { country in
                 HStack {
                     Text("\(country.country) (\(country.countryCode))")
@@ -52,6 +70,10 @@ struct CatalogDetailScreen: View {
         .navigationTitle("Movie Details")
         .onAppear {
             viewModel.fetchAvailability(for: catalogItem)
+            viewModel.fetchSavedItems()
+        }
+        .onChange(of: viewModel.watchlistMessage) { newValue in
+            showWatchlistAlert = newValue != nil
         }
     }
 }

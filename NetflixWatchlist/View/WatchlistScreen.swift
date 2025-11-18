@@ -9,25 +9,60 @@ import SwiftUI
 
 struct WatchlistScreen: View {
     @EnvironmentObject var watchlistViewModel: WatchlistViewModel
+    @State private var showClearConfirmation = false
 
     var body: some View {
         VStack {
-            List(watchlistViewModel.savedItems, id: \.itemId) { item in
-                NavigationLink(destination: CatalogDetailScreen(catalogItem: item.toCatalogItem())) {
-                    HStack {
-                        AsyncImage(url: URL(string: item.img ?? ""))
+            List {
+                ForEach(watchlistViewModel.savedItems, id: \.objectID) { item in
+                    NavigationLink(destination: CatalogDetailScreen(catalogItem: item.toCatalogItem())) {
+                        HStack {
+                            AsyncImage(url: URL(string: item.img ?? "")) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                            } placeholder: {
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.2))
+                            }
                             .frame(width: 50, height: 75)
                             .cornerRadius(8)
-                        
-                        VStack(alignment: .leading) {
-                            Text(item.title ?? "Unknown Title")
-                                .font(.headline)
+
+                            VStack(alignment: .leading) {
+                                Text(item.title ?? "Unknown Title")
+                                    .font(.headline)
+                            }
                         }
+                    }
+                }
+                .onDelete { indexSet in
+                    indexSet.forEach { index in
+                        let item = watchlistViewModel.savedItems[index]
+                        watchlistViewModel.removeFromWatchlist(item)
                     }
                 }
             }
         }
         .navigationTitle("Watchlist")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                if !watchlistViewModel.savedItems.isEmpty {
+                    Button(role: .destructive) {
+                        showClearConfirmation = true
+                    } label: {
+                        Text("Clear All")
+                    }
+                }
+            }
+        }
+        .alert("Clear watchlist?", isPresented: $showClearConfirmation) {
+            Button("Delete All", role: .destructive) {
+                watchlistViewModel.clearWatchlist()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will remove every saved title from your watchlist.")
+        }
         .onAppear {
             watchlistViewModel.fetchSavedItems()
         }

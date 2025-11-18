@@ -12,18 +12,25 @@ struct SearchResultsScreen: View {
 
     var body: some View {
         VStack {
-            
-            Text("\(viewModel.apiCallCount)")
+
+            Text("Remaining API Calls (PST): \(viewModel.apiCallCount) of \(viewModel.apiLimit)")
                 .font(.title)
                 .fontWeight(.bold)
 
             List(viewModel.searchResults, id: \.itemId) { item in
                 NavigationLink(destination: CatalogDetailScreen(catalogItem: item)) {
                     HStack {
-                        AsyncImage(url: URL(string: item.img))
-                            .frame(width: 50, height: 75)
-                            .cornerRadius(8)
-                        
+                        AsyncImage(url: URL(string: item.img)) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                        } placeholder: {
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.2))
+                        }
+                        .frame(width: 50, height: 75)
+                        .cornerRadius(8)
+
                         VStack(alignment: .leading) {
                             Text(item.title)
                                 .font(.headline)
