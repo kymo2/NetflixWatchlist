@@ -45,6 +45,11 @@ class UnogsService {
             return
         }
 
+        guard !apiKey.isEmpty, !apiHost.isEmpty else {
+            completion(.failure(.missingCredentials))
+            return
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue(apiKey, forHTTPHeaderField: "x-rapidapi-key")
@@ -55,6 +60,11 @@ class UnogsService {
         URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
                 completion(.failure(SearchError.networkError(error?.localizedDescription ?? "Unknown error")))
+                return
+            }
+
+            if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+                completion(.failure(.networkError("HTTP \(httpResponse.statusCode)")))
                 return
             }
 
@@ -97,6 +107,12 @@ class UnogsService {
             return
         }
 
+        guard !apiKey.isEmpty, !apiHost.isEmpty else {
+            print("Missing API credentials; cannot fetch availability")
+            completion([])
+            return
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue(apiKey, forHTTPHeaderField: "x-rapidapi-key")
@@ -107,6 +123,12 @@ class UnogsService {
         URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
                 print("Error fetching availability:", error?.localizedDescription ?? "Unknown error")
+                completion([])
+                return
+            }
+
+            if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+                print("Availability request failed with status: \(httpResponse.statusCode)")
                 completion([])
                 return
             }
@@ -148,10 +170,6 @@ private extension String {
             if let attributed = try? NSAttributedString(data: data, options: options, documentAttributes: nil) {
                 return attributed.string
             }
-        }
-
-        if let decoded = CFXMLCreateStringByUnescapingEntities(nil, self as CFString, nil) as String? {
-            return decoded
         }
 
         return self

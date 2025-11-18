@@ -39,6 +39,8 @@ class SearchViewModel: ObservableObject {
                     switch error {
                     case .invalidURL:
                         self.errorMessage = "Invalid URL"
+                    case .missingCredentials:
+                        self.errorMessage = "Missing API credentials. Check API_KEY and API_HOST."
                     case .networkError(let message):
                         self.errorMessage = "Network error: \(message)"
                     case .emptyResults:
