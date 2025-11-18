@@ -15,7 +15,6 @@ class SearchViewModel: ObservableObject {
     @Published var selectedAvailability: [CountryAvailability] = []
     @Published var savedItems: [SavedCatalogItem] = []
     @Published var watchlistMessage: String?
-    @Published private(set) var pendingWatchlistItemIDs: Set<String> = []
 
     private let service = UnogsService()
     private let coreDataManager = CoreDataManager.shared
@@ -83,15 +82,12 @@ class SearchViewModel: ObservableObject {
             return
         }
 
-        pendingWatchlistItemIDs.insert(item.itemId)
-
         service.fetchCatalogItemAvailability(itemId: item.itemId) { [weak self] availability in
             DispatchQueue.main.async {
                 print("✅ Retrieved \(availability.count) country availability records for \(item.title)")
 
                 self?.coreDataManager.saveCatalogItem(item: item, availability: availability) // ✅ Save movie + country data
                 self?.fetchSavedItems() // ✅ Refresh saved items after saving
-                self?.pendingWatchlistItemIDs.remove(item.itemId)
                 self?.watchlistMessage = "Added to watchlist"
             }
         }
@@ -119,11 +115,10 @@ class SearchViewModel: ObservableObject {
     func removeFromWatchlist(item: CatalogItem) {
         coreDataManager.deleteSavedItem(itemId: item.itemId)
         fetchSavedItems()
-        pendingWatchlistItemIDs.remove(item.itemId)
         watchlistMessage = "Removed from watchlist"
     }
 
     func isItemSaved(_ item: CatalogItem) -> Bool {
-        savedItems.contains(where: { $0.itemId == item.itemId }) || pendingWatchlistItemIDs.contains(item.itemId)
+        savedItems.contains(where: { $0.itemId == item.itemId })
     }
 }

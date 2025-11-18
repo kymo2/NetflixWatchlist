@@ -131,18 +131,6 @@ extension CoreDataManager {
             print("Failed to delete item with id \(itemId): \(error.localizedDescription)")
         }
     }
-
-    func deleteAllSavedItems() {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = SavedCatalogItem.fetchRequest()
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-
-        do {
-            try context.execute(deleteRequest)
-            saveContext()
-        } catch {
-            print("Failed to delete all saved items: \(error.localizedDescription)")
-        }
-    }
     
     func itemExists(itemId: String, in context: NSManagedObjectContext) -> Bool {
         let fetchRequest: NSFetchRequest<SavedCatalogItem> = SavedCatalogItem.fetchRequest()
