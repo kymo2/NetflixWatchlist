@@ -12,17 +12,25 @@ struct WatchlistScreen: View {
 
     var body: some View {
         VStack {
-            List(watchlistViewModel.savedItems, id: \.itemId) { item in
-                NavigationLink(destination: CatalogDetailScreen(catalogItem: item.toCatalogItem())) {
-                    HStack {
-                        AsyncImage(url: URL(string: item.img ?? ""))
-                            .frame(width: 50, height: 75)
-                            .cornerRadius(8)
-                        
-                        VStack(alignment: .leading) {
-                            Text(item.title ?? "Unknown Title")
-                                .font(.headline)
+            List {
+                ForEach(watchlistViewModel.savedItems, id: \.objectID) { item in
+                    NavigationLink(destination: CatalogDetailScreen(catalogItem: item.toCatalogItem())) {
+                        HStack {
+                            AsyncImage(url: URL(string: item.img ?? ""))
+                                .frame(width: 50, height: 75)
+                                .cornerRadius(8)
+
+                            VStack(alignment: .leading) {
+                                Text(item.title ?? "Unknown Title")
+                                    .font(.headline)
+                            }
                         }
+                    }
+                }
+                .onDelete { indexSet in
+                    indexSet.forEach { index in
+                        let item = watchlistViewModel.savedItems[index]
+                        watchlistViewModel.removeFromWatchlist(item)
                     }
                 }
             }
